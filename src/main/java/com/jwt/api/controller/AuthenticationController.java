@@ -84,26 +84,39 @@ public class AuthenticationController {
                                       @RequestParam("user_name") String userName, @RequestParam("email") String email
             , @RequestParam("password") String password) {
         System.out.println("first_name " + firstName + " lastName " + lastName + " userName " + userName + " email " + email + " password " + password);
+        // TODO отдельный класс для ответа ?
         Map<String, Object> responseMap = new HashMap<>();
-        User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setPassword(new BCryptPasswordEncoder().encode(password));
-        user.setRole("USER");
-        user.setUserName(userName);
+        boolean isNewUser = userRepository.existsById(userName);
+        if (!isNewUser) {
+            User user = new User();
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setEmail(email);
+            user.setPassword(new BCryptPasswordEncoder().encode(password));
+            user.setRole("USER");
+            user.setUserName(userName);
 
-        UserDetails userDetails = userDetailsService.createUserDetails(userName, user.getPassword());
-        String token = jwtTokenUtil.generateToken(userDetails);
+            UserDetails userDetails = userDetailsService.createUserDetails(userName, user.getPassword());
+            String token = jwtTokenUtil.generateToken(userDetails);
 
-        userRepository.save(user);
-        System.out.println("save? " +userRepository.save(user));
+            userRepository.save(user);
+            System.out.println("save? " + userRepository.save(user));
 
 
-        responseMap.put("error", false);
-        responseMap.put("username", userName);
-        responseMap.put("message", "Account created successfully");
-        responseMap.put("token", token);
-        return ResponseEntity.ok(responseMap);
+            responseMap.put("error", false);
+            responseMap.put("username", userName);
+            responseMap.put("message", "Account created successfully");
+            responseMap.put("token", token);
+            return ResponseEntity.status(200).body(responseMap);
+        }
+        else {
+            responseMap.put("error", true);
+            responseMap.put("username", userName);
+            responseMap.put("message", "Already have this username.");
+            responseMap.put("token", null);
+            return ResponseEntity.status(401).body(responseMap);
+        }
+
+
     }
 }
