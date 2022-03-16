@@ -10,7 +10,7 @@ const initialState = {
 
 
 const dataReducer = (state, action) => {
-
+   
     switch (action.type) {
         case ReducerActionRouter.LOGIN:
             const responseLogin = action.payload;
