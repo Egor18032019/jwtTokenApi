@@ -1,21 +1,25 @@
 const AppRoute = {
     ROOT: `/`,
     AUTH: `/login`,
-    INFO : `/info`,
-    LOGOUT : `/logout`,
+    INFO: `/info`,
+    LOGOUT: `/logout`,
+    USER: `/user`,
 };
-const Active = {
-    TRUE: "TRUE",
-    FALSE: `FALSE`,
-} 
+
 
 const ReducerActionRouter = {
-    LOGIN : `LOGIN`,
-    INFO : `INFO`,
+    LOGIN: `LOGIN`,
+    INFO: `INFO`,
+}
+
+const BACKEND = {
+    LOGIN: "/auth/login",
+    LOGOUT: "/auth/logout",
+    USER: "/user"
 }
 
 export {
-     AppRoute,
-     Active,
-     ReducerActionRouter
+    AppRoute,
+    ReducerActionRouter,
+    BACKEND
 };

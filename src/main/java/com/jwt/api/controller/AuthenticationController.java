@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,8 +34,10 @@ public class AuthenticationController {
     final JwtUserDetailsService userDetailsService;
     final JwtTokenUtil jwtTokenUtil;
 
-    public AuthenticationController(UserRepository userRepository, AuthenticationManager authenticationManager,
-                                    JwtUserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil) {
+    public AuthenticationController(UserRepository userRepository,
+                                    AuthenticationManager authenticationManager,
+                                    JwtUserDetailsService userDetailsService,
+                                    JwtTokenUtil jwtTokenUtil) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
@@ -42,15 +45,24 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam("user_name") String username,
+    public ResponseEntity<?> loginUser(HttpServletRequest request,
+            @RequestParam("user_name") String username,
                                        @RequestParam("password") String password) {
         Map<String, Object> responseMap = new HashMap<>();
         try {
-            Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username
-                    , password));
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            username, password
+                    ));
             if (auth.isAuthenticated()) {
                 logger.info("Logged In");
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                User user = userRepository.findUserByUsername(username);
+                final String userAgentHeader = request.getHeader("User-Agent");
+                final String remoteAddr = request.getHeader("X-FORWARDED-FOR");
+                System.out.println("userAgentHeader "+ userAgentHeader + "  remoteAddr  " + remoteAddr);
+                user.setAgent(userAgentHeader);
+                userRepository.save(user);
                 String token = jwtTokenUtil.generateToken(userDetails);
                 responseMap.put("error", false);
                 responseMap.put("message", "Logged In");
@@ -108,8 +120,7 @@ public class AuthenticationController {
             responseMap.put("message", "Account created successfully");
             responseMap.put("token", token);
             return ResponseEntity.status(200).body(responseMap);
-        }
-        else {
+        } else {
             responseMap.put("error", true);
             responseMap.put("username", userName);
             responseMap.put("message", "Already have this username.");

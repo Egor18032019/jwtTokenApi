@@ -1,33 +1,28 @@
 import React from "react";
-import { ReducerActionRouter, Active } from "./CONST.js"
+import { ReducerActionRouter } from "./CONST.js"
 
-const DataContext = React.createContext("cells");
+const DataContext = React.createContext("info");
 const initialState = {
-    auth: Active.FALSE,
+    error: false,
+    username: "",
     result: [],
     status: ""
 };
 
 
 const dataReducer = (state, action) => {
-   
+
     switch (action.type) {
-        case ReducerActionRouter.LOGIN:
-            const responseLogin = action.payload;
+ 
+        case ReducerActionRouter.INFO:
+            const response = action.payload;
 
             return Object.assign(
                 {}, state, {
-                result: responseLogin,
+                error: response.error,
+                username: response.username,
                 status: "LOGIN"
             })
-            case ReducerActionRouter.INFO:
-                const response = action.payload;
-    
-                return Object.assign(
-                    {}, state, {
-                    result: response,
-                    status: "INFO"
-                })
         default:
             return Object.assign(
                 {}, state, {

@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { DataContext } from "./DataReducer"
-import { ReducerActionRouter } from "./CONST.js"
+import React, { useState, useRef } from 'react';
 import './Auth.css';
 import { authUser } from "./Api.js"
 
 
 function Auth() {
-    const { state, dispatch } = useContext(DataContext);
-
+    let [userData, setUserData] = useState({
+        error: false,
+        message: ""
+    });
+    console.log("Auth ! ")
     let formRef = useRef(null);
     let loginRef = useRef(null);
     let passwordRef = useRef(null);
@@ -16,30 +17,16 @@ function Auth() {
 
     const Login = (evt) => {
         evt.preventDefault();
-        console.log("SendCells ")
         const userRequest = {
             user_name: loginRef.current.value,
             password: passwordRef.current.value,
         }
         authUser(userRequest).then(
-            (data) => {
-                console.log("isRequestHaveError")
+            data => {
                 console.log(data)
-                let isRequestHaveError = data.error;
-                console.log(isRequestHaveError)
-                if (isRequestHaveError) {
-                    console.error(data.message)
-                }
-                else {
-                    console.log(data.token)
-                    const token = data.token;
-                    sessionStorage.setItem('tokenData', JSON.stringify(token));
-                }
-
-               
-
+                setUserData(data);
             }
-        )
+        );
     }
 
     const _handleReset = () => {
@@ -48,6 +35,7 @@ function Auth() {
 
     return (
         <div className="auth">
+            <h2>{userData.error ? userData.message : ""}</h2>
             <form className="auth-form" ref={formRef}>
 
                 <fieldset className="auth-form__element">
