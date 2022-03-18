@@ -17,12 +17,14 @@ public class User {
 
     @Id
     private String userName;
+
     private String firstName;
     private String lastName;
     @Indexed(unique = true)
     private String email;
     private String password;
     private String role;
+    private String agent;
 
     @Override
     public String toString() {
@@ -32,6 +34,7 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", agent='" + agent + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }
